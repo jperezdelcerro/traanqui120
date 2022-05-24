@@ -1,3 +1,8 @@
+import numpy as np
+import math
+
+track_direction = 0
+
 def reward_function(params):
     '''
     Example of rewarding the agent to follow center line
@@ -8,6 +13,7 @@ def reward_function(params):
     distance_from_center = params['distance_from_center']
     all_wheels_on_track = params['all_wheels_on_track']
     waypoints = params['waypoints']
+    speed = params['speed']
     
     # closest_waypoints
     # Type:  [int, int]
@@ -23,13 +29,25 @@ def reward_function(params):
     # Heading direction, in degrees, of the agent with respect to the x-axis of the coordinate system.
     heading = params['heading']
     
-    # Calculate 3 markers that are at varying distances away from the center line
-    marker_1 = 0.1 * track_width
-    marker_2 = 0.25 * track_width
-    marker_3 = 0.5 * track_width
-    
     DIRECTION_THRESHOLD = 10.0
+    getDirectionDiff(waypoints, closest_waypoints, heading)
     
+    # Give higher reward if the car is inside the track
+    if all_wheels_on_track:
+        # Give higher reward if the car is closer to center line and vice versa
+        reward = markersPenalty(distance_from_center, track_width)
+        reward = speedPenalty(track_direction, speed, reward)
+    else:
+        reward = 1e-6  # likely crashed/ close to off track
+        
+    # Penalize the reward if the difference is too large
+    if getDirectionDiff(waypoints, closest_waypoints, heading) > DIRECTION_THRESHOLD:
+        reward *= 0.5
+    
+    return float(reward)
+
+def getDirectionDiff(waypoints, closest_waypoints, heading):
+      
     # Calculate the direction of the center line based on the closest waypoints
     next_point = waypoints[closest_waypoints[1]]
     prev_point = waypoints[closest_waypoints[0]]
@@ -43,23 +61,30 @@ def reward_function(params):
     direction_diff = abs(track_direction - heading)
     if direction_diff > 180:
         direction_diff = 360 - direction_diff
-    
-    # Give higher reward if the car is inside the track
-    if all_wheels_on_track:
-        # Give higher reward if the car is closer to center line and vice versa
-        if distance_from_center <= marker_1:
-            reward = 1.0
-        elif distance_from_center <= marker_2:
-            reward = 0.5
-        elif distance_from_center <= marker_3:
-            reward = 0.1
-        else:
-            reward = 1e-3
-    else:
-        reward = 1e-6  # likely crashed/ close to off track
         
-    # Penalize the reward if the difference is too large
-    if direction_diff > DIRECTION_THRESHOLD:
+    return direction_diff
+
+def markersPenalty(distance_from_center, track_width):
+  for marker in np.arange(0,1,0.05):
+    if distance_from_center <= marker * track_width:
+      return 1-marker
+
+def speedPenalty(track_direction, speed, reward):
+  if track_direction <= 0:
+    track_direction = track_direction * -1
+
+  SPEED_THRESHOLD = 1
+  deltaAngle = 5
+  goodAngles =  [0, 90, 180 ,270]
+
+  for angle in goodAngles:
+    if angle - deltaAngle <= track_direction <= angle + deltaAngle:
+      if speed <= SPEED_THRESHOLD:
+          if reward:
+            reward += 0.8
+          else:
+            reward = 0.8
+      else:
         reward *= 0.5
-    
-    return float(reward)
+  
+  return reward
