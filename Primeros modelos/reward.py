@@ -6,9 +6,12 @@ import math
 DIRECTION_THRESHOLD = 4
 SPEED_THRESHOLD = 1
 MAX_SPEED_THRESHOLD = 3
-GOOD_ANGLES_TRACK =  [0, 90, 180 ,270]
+GOOD_ANGLES_TRACK =  [0, 90, 180, 270]
 GOOD_ANGLES_HEADING =  [0, 90, 180, -90, -180]
 TOTAL_NUM_STEPS = 300
+ABS_STEERING_THRESHOLD = 20
+
+#Variables
 STEERING_ANGLES = []
 
 def reward_function(params):
@@ -43,7 +46,7 @@ def reward_function(params):
         reward = markersPenalty(distance_from_center, track_width)
         reward = curveSpeedPenalty(direction_diff, speed, reward)
         reward = straightSpeedPenalty(track_direction, speed, reward)
-        #reward = zigzagPenalty(STEERING_ANGLES) #to do
+        reward = zigzagPenalty(STEERING_ANGLES, reward)
         reward = stepsReward(steps, progress, reward)
         
         # Penalize the reward if the difference is too large
@@ -81,7 +84,7 @@ def markersPenalty(distance_from_center, track_width):
 def curveSpeedPenalty(direction_diff, speed, reward):
   #if the car isnt going staight, and the speed is 
     deltaAngle = 5
-    if direction_diff > deltaAngle: #
+    if direction_diff > deltaAngle: 
         if speed > SPEED_THRESHOLD:
             reward *= 0.5
     return reward
@@ -93,15 +96,23 @@ def straightSpeedPenalty(track_direction, speed, reward):
                 reward *= 0.5  
     return reward
 
-def zigzagPenalty(track_direction, steering_angle, reward):
-    # if the track path is straight and the car is steering too much, penalize
-     
-    deltaAngle = 3
-    if track_direction in GOOD_ANGLES_TRACK:
-        if abs(steering_angle) - deltaAngle > 0:
-                reward *= 0.5
-             
+def zigzagPenalty(steering_angles, reward):
+# Prevents zigzag 
+    if len(steering_angles > 2):
+        last = steering_angles[-1]
+        previous = steering_angles[-2]
+
+        if np.sign(last) != np.sign(previous):
+            reward *= 0.8
+
     return reward
+        
+
+
+
+
+
+ 
 
 def stepsReward(steps, progress, reward):
     # Give additional reward if the car pass every 100 steps faster than expected
