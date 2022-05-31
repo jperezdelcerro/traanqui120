@@ -56,7 +56,7 @@ def reward_function(params):
         reward = 1e-6  # likely crashed/ close to off track
         
     
-    return float(reward)
+    return reward if reward else 1e-15
 
 def getTrackDirection(waypoints, closest_waypoints):
     # Calculate the direction of the center line based on the closest waypoints
@@ -93,12 +93,14 @@ def straightSpeedPenalty(track_direction, speed, reward):
     # If the track path is straight and the car is not going top speed, penalize
     if track_direction in GOOD_ANGLES_TRACK:
         if speed != MAX_SPEED_THRESHOLD:
+            if reward:
                 reward *= 0.5  
+            
     return reward
 
 def zigzagPenalty(steering_angles, reward):
 # Prevents zigzag 
-    if len(steering_angles > 2):
+    if len(steering_angles) > 2:
         last = steering_angles[-1]
         previous = steering_angles[-2]
 
@@ -107,13 +109,6 @@ def zigzagPenalty(steering_angles, reward):
 
     return reward
         
-
-
-
-
-
- 
-
 def stepsReward(steps, progress, reward):
     # Give additional reward if the car pass every 100 steps faster than expected
     
