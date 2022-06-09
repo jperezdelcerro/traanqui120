@@ -1,0 +1,14 @@
+git clone https://github.com/Esalaine/deepracer-templates
+cd deepracer-templates
+./create-base-resources.sh fideo-base 190.18.77.3 3000
+./create-image-builder.sh fideo-base fideo-image ->ponerla a correr
+
+ 
+
+para updatear el file: actions, upload. Se tiene que llamar reward_function.py 
+en consola 
+cp /home/cloudshell-user/reward_function.py /home/cloudshell-user/deepracer-templates/custom-files
+
+
+./create-standard-instance.sh fideo-base fideo-training-01 60
+http://ec2ip.190.18.77.3:8080
