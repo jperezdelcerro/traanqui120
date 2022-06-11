@@ -1,14 +1,28 @@
 git clone https://github.com/Esalaine/deepracer-templates
-cd deepracer-templates
+
+
+cd deepracer-templates -> para correr ./ hay que estar aca 
+
+
 ./create-base-resources.sh fideo-base 190.18.77.3 3000
-./create-image-builder.sh fideo-base fideo-image ->ponerla a correr
+./create-image-builder.sh fideo-base fideo-image ->creamos la imagen y la ponemos a correr desde ec2 image builder
 
  
-
-para updatear el file: actions, upload. Se tiene que llamar reward_function.py 
+para updatear files
+ - > actions, upload. Se tiene que llamar reward_function.py,run.env, igual que siempre
+despues hay qe copiarlo a la carpeta de custom files
 en consola 
+si el archivo ya existe en home, 
+rm reward_funcition.py
+rm run.env
 cp /home/cloudshell-user/reward_function.py /home/cloudshell-user/deepracer-templates/custom-files
+cp /home/cloudshell-user/run.env /home/cloudshell-user/deepracer-templates/custom-files
+cp /home/cloudshell-user/model_metadata.json /home/cloudshell-user/deepracer-templates/custom-files
 
 
-./create-standard-instance.sh fideo-base fideo-training-01 60
-http://ec2ip.190.18.77.3:8080
+nuevo training
+./create-standard-instance.sh fideo-base fideo-training-01 60 -> esto arranca el training
+
+quizas te pida cambiar el nombre del modelo del auto
+
+http://ec2ip.52.23.207.240:8080

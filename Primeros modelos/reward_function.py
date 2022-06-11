@@ -4,7 +4,7 @@ import math
 
 # Thresholds 
 DIRECTION_THRESHOLD = 4
-SPEED_THRESHOLD = 1
+SPEED_THRESHOLD = 3
 MAX_SPEED_THRESHOLD = 3
 GOOD_ANGLES_TRACK =  [0, 90, 180, 270]
 GOOD_ANGLES_HEADING =  [0, 90, 180, -90, -180]
@@ -46,7 +46,7 @@ def reward_function(params):
         reward = markersPenalty(distance_from_center, track_width)
         reward = curveSpeedPenalty(direction_diff, speed, reward)
         reward = straightSpeedPenalty(track_direction, speed, reward)
-        reward = zigzagPenalty(STEERING_ANGLES, reward)
+        #reward = zigzagPenalty(STEERING_ANGLES, reward)
         reward = stepsReward(steps, progress, reward)
         
         # Penalize the reward if the difference is too large
