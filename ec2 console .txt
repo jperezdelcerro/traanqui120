@@ -1,20 +1,19 @@
 git clone https://github.com/Esalaine/deepracer-templates
 
-
 cd deepracer-templates -> para correr ./ hay que estar aca 
 
+./create-base-resources.sh fideo-base 190.18.77.3
 
-./create-base-resources.sh fideo-base 190.18.77.3 3000
-./create-image-builder.sh fideo-base fideo-image ->creamos la imagen y la ponemos a correr desde ec2 image builder
+----------------------------------------------------------------------------------
 
- 
 para updatear files
- - > actions, upload. Se tiene que llamar reward_function.py,run.env, igual que siempre
+- > actions, upload. Se tiene que llamar reward_function.py,run.env, igual que siempre
 despues hay qe copiarlo a la carpeta de custom files
 en consola 
 si el archivo ya existe en home, 
 rm reward_funcition.py
 rm run.env
+
 cp /home/cloudshell-user/reward_function.py /home/cloudshell-user/deepracer-templates/custom-files
 cp /home/cloudshell-user/run.env /home/cloudshell-user/deepracer-templates/custom-files
 cp /home/cloudshell-user/model_metadata.json /home/cloudshell-user/deepracer-templates/custom-files
