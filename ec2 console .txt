@@ -13,10 +13,9 @@ en consola
 si el archivo ya existe en home, 
 rm reward_funcition.py
 rm run.env
-
-cp /home/cloudshell-user/reward_function.py /home/cloudshell-user/deepracer-templates/custom-files
-cp /home/cloudshell-user/run.env /home/cloudshell-user/deepracer-templates/custom-files
-cp /home/cloudshell-user/model_metadata.json /home/cloudshell-user/deepracer-templates/custom-files
+mv *.py  ~/deepracer-templates
+mv *.env  ~/deepracer-templates
+mv *.hjson  ~/deepracer-templates
 
 
 nuevo training

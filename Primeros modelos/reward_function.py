@@ -40,23 +40,21 @@ def reward_function(params):
     direction_diff = getDirectionDiff(track_direction, heading) 
     
     # Give higher reward if the car is inside the track
-    if all_wheels_on_track:
-        # Give higher reward if the car is closer to center line and vice versa
-        reward = 1e-15
-        reward = markersPenalty(distance_from_center, track_width)
-        reward = curveSpeedPenalty(direction_diff, speed, reward)
-        reward = straightSpeedPenalty(track_direction, speed, reward)
-        #reward = zigzagPenalty(STEERING_ANGLES, reward)
-        reward = stepsReward(steps, progress, reward)
-        
-        # Penalize the reward if the difference is too large
-        if getDirectionDiff(track_direction, heading) > DIRECTION_THRESHOLD:
-            reward *= 0.5
-    else:
-        reward = 1e-6  # likely crashed/ close to off track
+   
+    # Give higher reward if the car is closer to center line and vice versa
+    reward = 21
+    #reward = markersPenalty(distance_from_center, track_width)
+    reward = curveSpeedPenalty(direction_diff, speed, reward)
+    reward = straightSpeedPenalty(track_direction, speed, reward)
+    #reward = zigzagPenalty(STEERING_ANGLES, reward)
+    #reward = stepsReward(steps, progress, reward)
+    
+    # Penalize the reward if the difference is too large
+    if getDirectionDiff(track_direction, heading) > DIRECTION_THRESHOLD:
+        reward -=10
         
     
-    return reward if reward else 1e-15
+    return float(reward) if reward else 1.0
 
 def getTrackDirection(waypoints, closest_waypoints):
     # Calculate the direction of the center line based on the closest waypoints
@@ -76,17 +74,17 @@ def getDirectionDiff(track_direction, heading):
         
     return direction_diff
 
-def markersPenalty(distance_from_center, track_width):
+def markersPenalty(distance_from_center, track_width): #no va :/
   for marker in np.arange(0,1,0.05):
     if distance_from_center <= marker * track_width:
       return 1-marker
 
-def curveSpeedPenalty(direction_diff, speed, reward):
+def curveSpeedPenalty(direction_diff, speed, reward):  #combinar con lo de dav id, chequear reinforment positivo
   #if the car isnt going staight, and the speed is 
     deltaAngle = 5
     if direction_diff > deltaAngle: 
-        if speed > SPEED_THRESHOLD:
-            reward *= 0.5
+        if speed < SPEED_THRESHOLD:
+            reward += 10 #cambiarlo 
     return reward
 
 def straightSpeedPenalty(track_direction, speed, reward):
@@ -94,7 +92,9 @@ def straightSpeedPenalty(track_direction, speed, reward):
     if track_direction in GOOD_ANGLES_TRACK:
         if speed != MAX_SPEED_THRESHOLD:
             if reward:
-                reward *= 0.5  
+                reward -=10
+            else:
+                reward +=10
             
     return reward
 
